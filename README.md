@@ -111,6 +111,7 @@ network Network
 
 Las conexiones deberán configurarse con tasas y demoras de transmisión para dos casos de
 estudio específicos:
+
 - Caso de estudio 1:
   - NodeTx a Queue: datarate = 1Mbps y delay = 100us
   - Queue a NodeRx: datarate = 1Mbps y delay = 100us
