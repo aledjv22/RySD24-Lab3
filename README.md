@@ -113,13 +113,13 @@ Las conexiones deberán configurarse con tasas y demoras de transmisión para do
 estudio específicos:
 
 - Caso de estudio 1:
-  - NodeTx a Queue: datarate = 1Mbps y delay = 100us
-  - Queue a NodeRx: datarate = 1Mbps y delay = 100us
-  - Queue a Sink: datarate = 0.5Mbps
+    - NodeTx a Queue: datarate = 1Mbps y delay = 100us
+    - Queue a NodeRx: datarate = 1Mbps y delay = 100us
+    - Queue a Sink: datarate = 0.5Mbps
 - Caso de estudio 2:
-  - NodeTx a Queue: datarate = 1Mbps y delay = 100us
-  - Queue a NodeRx: datarate = 0.5Mbps y delay = 100us
-  - Queue a Sink: datarate = 1Mbps
+    - NodeTx a Queue: datarate = 1Mbps y delay = 100us
+    - Queue a NodeRx: datarate = 0.5Mbps y delay = 100us
+    - Queue a Sink: datarate = 1Mbps
 
 El módulo gen deberá tomar como parámetro el tamaño del paquete en Bytes (`packetByteSize`) que tendrá un valor de 12500 Bytes. Los mismos serán generados en intervalos de tiempos exponenciales con media de 100 ms.
 
