@@ -192,3 +192,72 @@ fenómeno.
 Responda y justifique
   1. ¿Qué diferencia observa entre el caso de estudio 1 y 2? ¿Cuál es la fuente limitante en cada uno? Investigue sobre la diferencia entre control de flujo y control de congestión (**ver Figura 6-22 del libro Tanenbaum**).
 
+## Tarea Diseño
+La segunda tarea es diseñar un sistema de control de flujo y congestión (entre el destino y el generador) de manera que se evite la pérdida de datos por saturación de buffers. El grupo es libre de diseñar o inventar o elegir cualquier algoritmo o estrategia que deseen. ¡Sean creativos!
+
+### Modificaciones en network.ned
+Se deberá agregar un canal de retorno desde el nodeRx al nodeTx para que el receptor pueda acusar información que regule la tasa de transmisión (*`feedback`*). Así, las queues evolucionarán a un nuevo módulo denominado `transportTx` y `transportRx`³.
+> ³Tener en cuenta que usando usando los operadores `$i` y `$o` se puede acceder a la entrada o salida independiente de una gate del tipo `inout`.
+
+```c++
+simple TransportTx
+{
+  parameters:
+    int bufferSize;
+    @display("i=block/queue;q=buffer");
+  gates:
+    input toApp;
+    inout toOut;
+}
+```
+
+```c++
+simple TransportRx
+{
+  parameters:
+    int bufferSize;
+    @display("i=block/queue;q=buffer");
+  gates:
+    output toApp;
+    inout toOut;
+}
+```
+
+<div align="center">
+  <img src="https://i.ibb.co/HDkGB1B/Captura-desde-2024-04-26-01-58-39.png" alt="Transport">
+</div>
+
+### Modificaciones en clases de C++
+La modificación más importante será generar las clases `TransportTx` y `TransportRx` en base a la clase existente Queue. `TransportRx` deberá ser capaz de enviar información sobre el estado de su buffer a `TransportTx` para que la ésta regule su flujo de transferencia.
+Considere generar un nuevo tipo de paquete (usando la definición de paquetes `packet.msg`) donde pueda agregar campos necesarios para su protocolo como “tamaño de buffer actual”, “bajar velocidad de transmisión”, “transmitir siguiente paquete”, etc.
+Puede usar la función `msg->setKind()` y `msg->getKind` para diferenciar entre paquetes que son de datos y paquetes de control (feedback). Por ejemplo, en `transportRx` se crea el feedback y se configura con el tipo 2:
+```c++
+// send feedback
+FeedbackPkt* feedbackPkt = new FeedbackPkt();
+feedbackPkt->setByteLength(20);
+feedbackPkt->setKind(2);
+feedbackPkt->setRemainingBuffer(par("bufferSize").longValue() - buffer.getLength());
+send(feedbackPkt, "toOut$o");
+``` 
+
+Mientras que en `transportTx` se filtra por tipo de paquete recibido, si es 2, es de feedback:
+```c++
+// msg is a packet
+if (msg->getKind() == 2) {
+  // msg is a feedbackPkt
+  FeedbackPkt* feedbackPkt = (FeedbackPkt*)msg;
+
+  // Do something with the feedback info
+  int remainingBuffer = feedbackPkt->getRemainingBuffer();
+  // (...)
+
+  delete msg;
+} else if (msg->getKind() == 0) {
+  // msg is a data packet
+```
+
+### Experimentos y Preguntas
+Utilice los mismos parámetros de los experimentos de la tarea 1, genere las curvas necesarias, y responda:
+  1. ¿Cómo cree que se comporta su algoritmo de control de flujo y congestión⁴? ¿Funciona para el caso de estudio 1 y 2 por igual? ¿Por qué?
+> ⁴En caso de implementar control de flujo y control en una sola estrategia, se recomienda evaluar el sistema con un tamaño de buffer de 100 paquetes en la queue conectando el transmisor y receptor. Este escenario permitirá estudiar el algoritmo con ambas funcionalidades operando simultáneamente.
+
