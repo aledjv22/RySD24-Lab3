@@ -261,3 +261,33 @@ Utilice los mismos parámetros de los experimentos de la tarea 1, genere las cur
   1. ¿Cómo cree que se comporta su algoritmo de control de flujo y congestión⁴? ¿Funciona para el caso de estudio 1 y 2 por igual? ¿Por qué?
 > ⁴En caso de implementar control de flujo y control en una sola estrategia, se recomienda evaluar el sistema con un tamaño de buffer de 100 paquetes en la queue conectando el transmisor y receptor. Este escenario permitirá estudiar el algoritmo con ambas funcionalidades operando simultáneamente.
 
+## Requisitos del código a entregar
+- El código debe ser claro y contener comentarios con detalles de lo que hicieron.
+- Se solicita un informe en el que se presenten los análisis de los experimentos y las respuestas a las preguntas de cada tarea. El informe debe estar escrito en texto plano o Markdown.
+- Las entregas serán a través del repositorio Git provisto por la Facultad para la Cátedra, con **fecha límite indicada en el cronograma del aula virtual**.
+
+## Ayuda Tarea Análisis
+A modo de ayuda y para saber si van por el camino indicado las simulaciones deberían arrojar un resultado parecido al siguiente:
+
+Si graficamos el delay promedio en toda la simulación tanto el caso 1 y 2 deberían ser parecidos (casi iguales), ya que lo que se busca es evidenciar un mismo problema solo que la diferencia es el lugar específico dónde se encuentra.
+
+Supongamos que empiezo a observar pérdidas de paquetes (tanto en el caso 1 como el caso 2) en el escenario donde el intervalo de generación de paquetes (generationInterval) es 0.1 . Si graficamos el delay promedio en determinado tiempo de la simulación obtendremos una gráfica como la siguiente:
+
+<div align="center">
+  <img src="https://i.ibb.co/rpjv1jp/Captura-desde-2024-04-26-18-23-58.png" alt="Transport">
+</div>
+
+Donde existe un crecimiento en el delay hasta llegar a un máximo, y este máximo puede ser alcanzado en algún tiempo determinado de la simulación, siempre suponiendo que en dicha simulación ocurre el fenómeno de pérdidas de paquetes. Lo importante es saber que en esta gráfica no van a notar diferencias entre el caso 1 y caso 2. **Ya que el problema es el mismo los dos tienen un cuello de botella en diferentes lugares pero es el mismo cuello de botella**.
+
+Lo central en esta primera parte de análisis es observar lo que sucede en cada buffer (emisor, red, receptor) y es ahí donde van a ver diferencias, esta observación nos permitirá identificar cuál de los casos de estudios corresponde a un problema de control de flujo o control de congestión.
+
+## Ayuda Tarea Diseño
+Lo interesante luego de solucionar el problema de la pérdida de paquetes tanto para el caso de estudio 1 y 2 ( o sea concéntrense en los casos donde el valor de **generationInterval** ocasionó pérdidas de paquetes ). Lo que se pide es realizar el famoso gráfico de **Carga Ofrecida vs Carga Útil** para eso tómense el tiempo de ver el video nuevamente. Lo importante nuevamente es que esa grafica va a mostrar los resultados de los casos 1 y 2 tanto para el escenario de la red de la primera parte como para el caso 1 y 2 de la segunda parte o sea lo ideal es que sean 4 curvas más una si grafican el limite teorico:
+
+<div align="center">
+  <img src="https://i.ibb.co/FwjQvM3/Captura-desde-2024-04-26-18-31-53.png" alt="Transport">
+</div>
+
+Esta gráfica agrupa los resultados de los distintos escenarios con resṕecto al valor de **generationInterval** mientras más valores de **generationInterval** prueben esta gráfica tendrá más representantes por cada caso y podrán observar con más detalle donde se produce el colapso por congestión que intentamos producir en la parte 1 del laboratorio. Si su diseño del algoritmo no soluciona correctamente algunas de las 2 causas que producen la pérdida de paquetes puede que observen colapso en la parte 2. No se preocupen si ocurre eso puede pasar solo tendrán que explicar las falencias de su implementación.
+
+Recuerde que el resultado de la parte de diseño no es tan importante, o sea si en su diseño no logran el objetivo de no perder paquetes no quiere decir que está mal el lab. Esto quiere decir que su diseño es peor que no hacer nada o un poco mejor aunque no óptimo.
