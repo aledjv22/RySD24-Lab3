@@ -264,7 +264,7 @@ Utilice los mismos parámetros de los experimentos de la tarea 1, genere las cur
 
 ## Requisitos del código a entregar
 - El código debe ser claro y contener comentarios con detalles de lo que hicieron.
-- Se solicita un informe en el que se presenten los análisis de los experimentos y las respuestas a las preguntas de cada tarea. El informe debe estar escrito en texto plano o Markdown.
+- Se solicita un informe en el que se presenten los análisis de los experimentos y las respuestas a las preguntas de cada tarea. El informe debe estar escrito en texto plano o Markdown. Además deberá contar con un apartado Anexo que especifique si utilizaron herramientas de Inteligencia Artificial (copilot, chatgpt, perplexity, etc.) detallando para qué la utilizaron, como interactuaron con esa herramienta, que diálogos tuvieron y cómo validaron las respuestas que les dio esa herramienta.
 - Las entregas serán a través del repositorio Git provisto por la Facultad para la Cátedra, con **fecha límite indicada en el cronograma del aula virtual**.
 
 ## Ayuda Tarea Análisis
