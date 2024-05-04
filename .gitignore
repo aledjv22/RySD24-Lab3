@@ -77,5 +77,8 @@
 .qtenvrc
 out/clang-release/
 results/
+General.anf
+lab3-kickstarter
+.metadata
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux,c++
