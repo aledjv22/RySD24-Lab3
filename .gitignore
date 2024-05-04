@@ -73,4 +73,9 @@
 ### PDF files ###
 *.pdf
 
+### Omnet++ ###
+.qtenvrc
+out/clang-release/
+results/
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux,c++
