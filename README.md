@@ -17,7 +17,8 @@ Se entrega como *kickstarter* un modelo de colas que consta de un generador (gen
   <img src="https://i.ibb.co/ZgzKym6/Captura-desde-2024-04-26-00-52-13.png" alt="Imagen network">
 </div>
 
-En el archivo omnetpp.ini se configura una simulación de 200s donde gen crea y transmite paquetes con intervalos dados por una distribución exponencial de media configurable, y queue es capaz de atenderlos bajo una misma distribución.
+En el archivo [omnetpp.ini](./omnetpp.ini) se configura una simulación de 200s donde gen crea y transmite paquetes con intervalos dados por una distribución exponencial de media configurable, y queue es capaz de atenderlos bajo una misma distribución.
+
 ```ini
 sim-time-limit = 200s
 Network.gen.generationInterval = exponential(1)
@@ -126,6 +127,8 @@ El módulo gen deberá tomar como parámetro el tamaño del paquete en Bytes (`p
 Las queue serán limitados en tamaño de buffer (`bufferSize`), expresado en cantidad de paquetes. Se configurará con un valor máximo de 200, salvo la cola del nodo transmisor que se dejará arbitrariamente alta².
 > ²El transmisor, en general, ya tiene en su memoria el contenido que desea transmitir, por lo que el tamaño de su buffer de salida no suele ser una limitante.
 
+[omnetpp.ini](./omnetpp.ini)
+
 ```ini
 sim-time-limit = 200s
 Network.nodeTx.gen.generationInterval = exponential(0.1)
@@ -135,14 +138,21 @@ Network.nodeRx.queue.bufferSize = 200
 Network.nodeTx.queue.bufferSize = 2000000
 ```
 
+Dentro del [omnetpp.ini](./omnetpp.ini) los parámetros agregados los tiene que poner aquí, en sección parámetros del [network.ned](./network.ned) correspondiente a cada nodo y en los archivos cc de cada tipo de nodo para ser reconocidos. ej: buffer size debe agregarse aqui, en el modulo [queue.cc](./Queue.cc) y en queue de [network.ned](./network.ned).
+
 ### Modificaciones en clases de C++
 Los objetos cMessage no tienen parámetros de tamaño en Bytes. Se deberá cambiar por objetos cPacket y configurar su tamaño en base al parámetro de configuración correspondiente.
 
+Archivo [generator.cc](./Generator.cc)
+
 ```c++
+// create new packet
 cPacket *pkt;
 pkt = new cPacket("packet");
 pkt->setByteLength(par("packetByteSize"));
 ```
+
+[queue.cc](./Queue.cc)
 
 El tiempo de servicio de Queue deberá basarse en la duración de la transmisión del paquete una vez ya encolado (tiene en cuenta la tasa de datos configurada en la conexión).
 
@@ -174,8 +184,9 @@ if (buffer.getLength() >= par("bufferSize").longValue()) {
 }
 ```
 
-Se deberán agregar nuevas métricas para el análisis en Queue, una que mida la cantidad de
-paquetes en el buffer, y otra que mida la cantidad de paquetes descartados por buffer saturado.
+Se deberán agregar nuevas métricas para el análisis en Queue, una que mida la cantidad de paquetes en el buffer, y otra que mida la cantidad de paquetes descartados por buffer saturado.
+
+`class Queue: public cSimpleModule // agregar en la definición de la clase`
   
 ```c++
 cOutVector bufferSizeVector;
@@ -184,11 +195,10 @@ cOutVector packetDropVector;
 
 ### Experimentos y Preguntas
 Se deberá correr simulaciones paramétricas para cada caso de estudio, variando el intervalo de generación de paquetes (`generationInterval`) entre 0.1 y 1 en los pasos que el grupo crea adecuado para responder las preguntas planteadas.
+
 Se **deberá** generar algunas gráficas representativas de la utilización de cada una de las 3 queue para los caso de estudios planteados.
-Se **sugiere** crear una gráfica de carga transmitida (eje x) vs. carga recibida (eje y), ambas
-expresadas en paquetes por segundo (**ver Figura 6-19 del libro Tanenbaum**). En caso de que
-haya pérdidas de paquetes también se sugiere medir y comparar estadísticas de ese
-fenómeno.
+
+Se **sugiere** crear una gráfica de carga transmitida (eje x) vs. carga recibida (eje y), ambas expresadas en paquetes por segundo (**ver Figura 6-19 del libro Tanenbaum**). En caso de que haya pérdidas de paquetes también se sugiere medir y comparar estadísticas de ese fenómeno.
 
 Responda y justifique
   1. ¿Qué diferencia observa entre el caso de estudio 1 y 2? ¿Cuál es la fuente limitante en cada uno? Investigue sobre la diferencia entre control de flujo y control de congestión (**ver Figura 6-22 del libro Tanenbaum**).
@@ -230,8 +240,11 @@ simple TransportRx
 
 ### Modificaciones en clases de C++
 La modificación más importante será generar las clases `TransportTx` y `TransportRx` en base a la clase existente Queue. `TransportRx` deberá ser capaz de enviar información sobre el estado de su buffer a `TransportTx` para que la ésta regule su flujo de transferencia.
+
 Considere generar un nuevo tipo de paquete (usando la definición de paquetes `packet.msg`) donde pueda agregar campos necesarios para su protocolo como “tamaño de buffer actual”, “bajar velocidad de transmisión”, “transmitir siguiente paquete”, etc.
+
 Puede usar la función `msg->setKind()` y `msg->getKind` para diferenciar entre paquetes que son de datos y paquetes de control (feedback). Por ejemplo, en `transportRx` se crea el feedback y se configura con el tipo 2:
+
 ```c++
 // send feedback
 FeedbackPkt* feedbackPkt = new FeedbackPkt();
@@ -242,6 +255,7 @@ send(feedbackPkt, "toOut$o");
 ``` 
 
 Mientras que en `transportTx` se filtra por tipo de paquete recibido, si es 2, es de feedback:
+
 ```c++
 // msg is a packet
 if (msg->getKind() == 2) {
@@ -272,7 +286,7 @@ A modo de ayuda y para saber si van por el camino indicado las simulaciones debe
 
 Si graficamos el delay promedio en toda la simulación tanto el caso 1 y 2 deberían ser parecidos (casi iguales), ya que lo que se busca es evidenciar un mismo problema solo que la diferencia es el lugar específico dónde se encuentra.
 
-Supongamos que empiezo a observar pérdidas de paquetes (tanto en el caso 1 como el caso 2) en el escenario donde el intervalo de generación de paquetes (generationInterval) es 0.1 . Si graficamos el delay promedio en determinado tiempo de la simulación obtendremos una gráfica como la siguiente:
+Supongamos que empiezo a observar pérdidas de paquetes (tanto en el caso 1 como el caso 2) en el escenario donde el intervalo de generación de paquetes (generationInterval) es 0.1. Si graficamos el delay promedio en determinado tiempo de la simulación obtendremos una gráfica como la siguiente:
 
 <div align="center">
   <img src="https://i.ibb.co/rpjv1jp/Captura-desde-2024-04-26-18-23-58.png" alt="Transport">
