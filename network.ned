@@ -2,6 +2,7 @@ simple Generator
 {
     parameters:
         volatile double generationInterval; // sec
+        int packetByteSize;
         @display("i=block/source");
     gates:
         output out;
@@ -11,6 +12,7 @@ simple Queue
 {
     parameters:
         volatile double serviceTime; // sec
+        int bufferSize;
         @display("i=block/queue;q=buffer");
     gates:
         input in;
@@ -65,7 +67,7 @@ module NodeRx
     //case study 1
     queue.out --> { datarate = 0.5Mbps; } --> sink.in;
     //case study 2
-    ??queue.out --> { datarate = 1Mbps; } --> sink.in;
+    //queue.out --> { datarate = 1Mbps; } --> sink.in;
 }
 
 network Network
