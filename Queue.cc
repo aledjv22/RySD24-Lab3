@@ -6,7 +6,8 @@
 
 using namespace omnetpp;
 
-class Queue: public cSimpleModule {
+class Queue: public cSimpleModule
+{
 private:
     cQueue buffer;
     cMessage *endServiceEvent;
@@ -22,28 +23,35 @@ protected:
 
 Define_Module(Queue);
 
-Queue::Queue() {
+Queue::Queue()
+{
     endServiceEvent = NULL;
 }
 
-Queue::~Queue() {
+Queue::~Queue()
+{
     cancelAndDelete(endServiceEvent);
 }
 
-void Queue::initialize() {
+void Queue::initialize()
+{
     buffer.setName("buffer");
     endServiceEvent = new cMessage("endService");
 }
 
-void Queue::finish() {
+void Queue::finish()
+{
 }
 
-void Queue::handleMessage(cMessage *msg) {
+void Queue::handleMessage(cMessage *msg)
+{
 
     // if msg is signaling an endServiceEvent
-    if (msg == endServiceEvent) {
+    if (msg == endServiceEvent)
+    {
         // if packet in buffer, send next one
-        if (!buffer.isEmpty()) {
+        if (!buffer.isEmpty())
+        {
             // dequeue packet
             cMessage *pkt = (cMessage*) buffer.pop();
             // send packet
@@ -52,11 +60,22 @@ void Queue::handleMessage(cMessage *msg) {
             serviceTime = par("serviceTime");
             scheduleAt(simTime() + serviceTime, endServiceEvent);
         }
-    } else { // if msg is a data packet
+    }
+    else     // if msg is a data packet
+    {
+
+        // send feedback
+        FeedbackPkt* feedbackPkt = new FeedbackPkt();
+        feedbackPkt->setByteLength(20);
+        feedbackPkt->setKind(2);
+        feedbackPkt->setRemainingBuffer(par("bufferSize").longValue() - buffer.getLength());
+        send(feedbackPkt, "toOut$o");
+
         // enqueue the packet
         buffer.insert(msg);
         // if the server is idle
-        if (!endServiceEvent->isScheduled()) {
+        if (!endServiceEvent->isScheduled())
+        {
             // start the service
             scheduleAt(simTime(), endServiceEvent);
         }
