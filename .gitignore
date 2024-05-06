@@ -80,5 +80,7 @@ results/
 General.anf
 lab3-kickstarter
 .metadata
+.settings/language.settings.xml
+Makefile
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux,c++
