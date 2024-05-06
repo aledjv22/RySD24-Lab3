@@ -83,4 +83,7 @@ lab3-kickstarter
 .settings/language.settings.xml
 Makefile
 
+### Formatting ###
+*.orig
+
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,linux,c++
