@@ -51,4 +51,17 @@ void TransportRx::initialize() {
     feedbackEndEvent = new cMessage("Fin Retroalimentación");
 }
 
+void TransportRx::finish() {
+    recordScalar("Paquetes decartados", packetDropCounter);
+}
+
+void TransportRx::transmitPacket() {
+    if (!bufferPackets.isEmpty()) {
+        // si hay paquetes en el buffer, envía el siguiente
+        cPacket *pkt = (cPacket*) bufferPackets.pop();
+        send(pkt, "toApp");
+        scheduleAt(simTime() + pkt->getDuration(), serviceEndEvent);
+    }
+}
+
 #endif
