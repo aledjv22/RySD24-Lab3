@@ -43,7 +43,12 @@ void Generator::finish() {
 void Generator::handleMessage(cMessage *msg) {
 
     // create new packet
-    cMessage *pkt = new cMessage("packet");
+    cPacket *pkt = new cPacket("packet");
+    // The cPacket constructor is similar
+    // to the cMessage constructor, but it
+    // accepts an additional bit length argument
+
+    packet->setByteLength(par("packetByteSize"));
     // send to the output
     send(pkt, "out");
 
