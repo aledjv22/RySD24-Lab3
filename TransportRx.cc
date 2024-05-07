@@ -64,4 +64,15 @@ void TransportRx::transmitPacket() {
     }
 }
 
+void TransportRx::addFeedbackToQueue(cMessage *msg){
+    if (feedbackQueue.getLength() < par("Tamaño del búfer de retroalimentación").intValue()) {
+        feedbackQueue.insert(msg);
+        if (!feedbackEndEvent->isScheduled()) {
+            scheduleAt(simTime() + 0, feedbackEndEvent);
+        }
+    } else {
+        delete msg;
+    }
+}
+
 #endif
