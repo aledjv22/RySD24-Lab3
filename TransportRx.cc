@@ -89,6 +89,9 @@ void TransportRx::handleMessage(cMessage *msg) {
     if (msg == serviceEndEvent) {
         // el mensaje es serviceEndEvent
         transmitPacket();    
+    } else if (msg == feedbackEndEvent) {
+        // el mensaje es feedbackEndEvent
+        transmitFeedback();    
     } else {
         // encola el mensaje
         if (msg->getKind() == 2) {
