@@ -11,8 +11,15 @@ private:
     cQueue buffer;
     cMessage *endServiceEvent;
     simtime_t serviceTime;
+
     cOutVector bufferSizeVector;
     cOutVector packetDropVector;
+    // Objects of type cOutVector are responsible
+    // for writing time series data (referred to as
+    // output vectors) to a file. The record()
+    // method is used to output a value (or a value pair)
+    // with a timestamp. The object name will serve as
+    // the name of the output vector.
 public:
     Queue();
     virtual ~Queue();
@@ -35,6 +42,8 @@ Queue::~Queue() {
 void Queue::initialize() {
     buffer.setName("buffer");
     endServiceEvent = new cMessage("endService");
+    bufferSizeVector.setName("Size-Vector");
+    packetDropVector.setName("Drop-Vector");
 }
 
 void Queue::finish() {
