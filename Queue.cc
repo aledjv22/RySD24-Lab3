@@ -11,6 +11,15 @@ private:
     cQueue buffer;
     cMessage *endServiceEvent;
     simtime_t serviceTime;
+
+    cOutVector bufferSizeVector;
+    cOutVector packetDropVector;
+    // Objects of type cOutVector are responsible
+    // for writing time series data (referred to as
+    // output vectors) to a file. The record()
+    // method is used to output a value (or a value pair)
+    // with a timestamp. The object name will serve as
+    // the name of the output vector.
 public:
     Queue();
     virtual ~Queue();
@@ -33,32 +42,28 @@ Queue::~Queue() {
 void Queue::initialize() {
     buffer.setName("buffer");
     endServiceEvent = new cMessage("endService");
+    bufferSizeVector.setName("Size-Vector");
+    packetDropVector.setName("Drop-Vector");
 }
 
 void Queue::finish() {
 }
 
 void Queue::handleMessage(cMessage *msg) {
-
-    // if msg is signaling an endServiceEvent
-    if (msg == endServiceEvent) {
-        // if packet in buffer, send next one
-        if (!buffer.isEmpty()) {
-            // dequeue packet
-            cMessage *pkt = (cMessage*) buffer.pop();
-            // send packet
-            send(pkt, "out");
-            // start new service
-            serviceTime = par("serviceTime");
-            scheduleAt(simTime() + serviceTime, endServiceEvent);
-        }
-    } else { // if msg is a data packet
+    // check buffer limit
+    if (buffer.getLength() >= par("BufferSize").longValue()) {
+        // drop the packet
+        delete msg;
+        this->buble("packet dropped");
+        packetDropVector.record(1);
+    } else {
         // enqueue the packet
         buffer.insert(msg);
+        bufferSizeVector.record(buffer.getLength());
         // if the server is idle
-        if (!endServiceEvent->isScheduled()) {
-            // start the service
-            scheduleAt(simTime(), endServiceEvent);
+        if(!endServiceEvent->isScheduled()){
+            // start the service now
+            scheduleAt(simTime() + 0, endServiceEvent);
         }
     }
 }
