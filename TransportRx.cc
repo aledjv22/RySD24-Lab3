@@ -75,4 +75,45 @@ void TransportRx::addFeedbackToQueue(cMessage *msg){
     }
 }
 
+void TransportRx::transmitFeedback() {
+    if (!feedbackQueue.isEmpty()) {
+        // si el buffer de retroalimentación no está vacío, envía el siguiente
+        FeedbackPkt *pkt = (FeedbackPkt*) feedbackQueue.pop();
+        send(pkt, "toOut$o");
+        scheduleAt(simTime() + pkt->getDuration(), feedbackEndEvent);
+    }
+}
+
+void TransportRx::handleMessage(cMessage *msg) {
+    packetBufferSizeVec.record(bufferPackets.getLength());
+    if (msg == serviceEndEvent) {
+        // el mensaje es serviceEndEvent
+        transmitPacket();    
+    } else {
+        // encola el mensaje
+        if (msg->getKind() == 2) {
+            const int threshold = 0.70 * par("Tamaño Buffer").intValue();
+            if (bufferPackets.getLength() < par("Tamaño Buffer").intValue()) {
+                if (bufferPackets.getLength() >= threshold){
+                    FeedbackPkt *fPkt = new FeedbackPkt();
+                    fPkt->setkind(2);
+                    fPkt->setByteLength(1);
+                    addFeedbackToQueue(fPkt);                
+                }
+                bufferPackets.insert(msg);
+                if (!serviceEndEvent->isScheduled()) {
+                    scheduleAt(simTime() + 0, serviceEndEvent);
+                }
+            } else {
+                this->bubble("Paquete descartado");
+                packetDropCounter++;
+                packetDropVec.record(packetDropCounter);
+                delete msg;
+            }
+        } else{
+            // el mensaje es un paquete de retroalimentación
+            addFeedbackToQueue(msg);
+        }
+    }
+}
 #endif
