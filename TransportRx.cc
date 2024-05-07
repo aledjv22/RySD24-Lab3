@@ -28,4 +28,27 @@ class TransportRx: public cSimpleModule {
         virtual void handleMessage(cMessage *msg);
 
 };
+
+Define_Module(TransportRx);
+
+TransportRx::TransportRx() {
+    serviceEndEvent = NULL;
+    feedbackEndEvent = NULL;
+}
+
+TransportRx::~TransportRx() {
+    cancelAndDelete(serviceEndEvent);
+    cancelAndDelete(feedbackEndEvent);
+}
+
+void TransportRx::initialize() {
+    bufferPackets.setName("Buffer del receptor");
+    feedbackQueue.setName("Buffer de retroalimentación");    
+    packetBufferSizeVec.setName("Tamaño del buffer");
+    packetDropVec.setName("Paquetes descartados");
+    packetDropCounter = 0;
+    serviceEndEvent = new cMessage("Fin Servicio");
+    feedbackEndEvent = new cMessage("Fin Retroalimentación");
+}
+
 #endif
