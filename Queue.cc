@@ -50,21 +50,32 @@ void Queue::finish() {
 }
 
 void Queue::handleMessage(cMessage *msg) {
-    // check buffer limit
-    if (buffer.getLength() >= par("BufferSize").longValue()) {
-        // drop the packet
-        delete msg;
-        this->buble("packet dropped");
-        packetDropVector.record(1);
-    } else {
-        // enqueue the packet
-        buffer.insert(msg);
-        bufferSizeVector.record(buffer.getLength());
-        // if the server is idle
-        if(!endServiceEvent->isScheduled()){
-            // start the service now
-            scheduleAt(simTime() + 0, endServiceEvent);
+    if(msg == endServiceEvent) {
+        if (!buffer.isEmpty()) {
+            cPacket *pkt = (cPacket *)buffer.pop();
+            send(pkt, "out");
+            serviceTime = pkt->getDuration();
+            scheduleAt(simTime() + serviceTime, endServiceEvent);
+            bufferSizeVector.record(buffer.getLength());
         }
+    } else {
+        // check buffer limit
+           if (buffer.getLength() >= par("bufferSize").intValue()) {
+               // Changed longValue to intValue due to it not existing
+               // drop the packet
+               delete msg;
+               this->bubble("packet dropped");
+               packetDropVector.record(1);
+           } else {
+               // enqueue the packet
+               buffer.insert(msg);
+               bufferSizeVector.record(buffer.getLength());
+               // if the server is idle
+               if(!endServiceEvent->isScheduled()){
+                   // start the service now
+                   scheduleAt(simTime() + 0, endServiceEvent);
+               }
+           }
     }
 }
 

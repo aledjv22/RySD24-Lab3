@@ -48,7 +48,7 @@ void Generator::handleMessage(cMessage *msg) {
     // to the cMessage constructor, but it
     // accepts an additional bit length argument
 
-    packet->setByteLength(par("packetByteSize"));
+    pkt->setByteLength(par("packetByteSize"));
     // send to the output
     send(pkt, "out");
 
