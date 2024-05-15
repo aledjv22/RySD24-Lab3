@@ -6,7 +6,8 @@
 
 using namespace omnetpp;
 
-class Queue: public cSimpleModule {
+class Queue: public cSimpleModule
+{
 private:
     cQueue buffer;
     cMessage *endServiceEvent;
@@ -31,22 +32,26 @@ protected:
 
 Define_Module(Queue);
 
-Queue::Queue() {
+Queue::Queue()
+{
     endServiceEvent = NULL;
 }
 
-Queue::~Queue() {
+Queue::~Queue()
+{
     cancelAndDelete(endServiceEvent);
 }
 
-void Queue::initialize() {
+void Queue::initialize()
+{
     buffer.setName("buffer");
     endServiceEvent = new cMessage("endService");
     bufferSizeVector.setName("Size-Vector");
     packetDropVector.setName("Drop-Vector");
 }
 
-void Queue::finish() {
+void Queue::finish()
+{
 }
 
 void Queue::handleMessage(cMessage *msg) {
