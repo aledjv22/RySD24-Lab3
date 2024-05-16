@@ -10,7 +10,7 @@ class TransportTx : public cSimpleModule
 {
 private:
     cOutVector bufferSizeQueue;
-    cOutVector packetDropQueue;
+    unsigned int packetDropQueue;
     cQueue bufferPackets;
     cMessage *serviceEndEvent;
     simtime_t serviceTime;
@@ -40,15 +40,14 @@ void TransportTx::initialize()
 {
     bufferPackets.setName("Buffer_del_transmisor");
     bufferSizeQueue.setName("Tamaño_del_buffer");
-    packetDropQueue.setName("Paquetes_descartados");
-    packetDropQueue.record(0);
+    packetDropQueue = 0;
     serviceEndEvent = new cMessage("Fin_Servicio");
     packetRate = 1.0;
 }
 
 void TransportTx::finish()
 {
-    recordScalar("Paquetes_descartados", packetDropQueue.getCount());
+    recordScalar("Paquetes_descartados", packetDropQueue);
 }
 
 void TransportTx::handleMessage(cMessage *msg)
@@ -70,7 +69,7 @@ void TransportTx::handleMessage(cMessage *msg)
         {
             delete(msg);
             this->bubble("Paquete_descartado");
-            packetDropQueue.record(1);
+            packetDropQueue++;
         }
         else
         {

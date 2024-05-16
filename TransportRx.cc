@@ -10,7 +10,7 @@ class TransportRx: public cSimpleModule
 {
 private:
     cOutVector bufferSizeQueue;
-    cOutVector packetDropQueue;
+    unsigned int packetDropQueue;
     cQueue bufferPackets;
     cQueue feedbackQueue;
     cMessage *serviceEndEvent;
@@ -46,9 +46,9 @@ void TransportRx::initialize()
 {
     bufferPackets.setName("Buffer del receptor");
     bufferSizeQueue.setName("Tamaño del buffer");
-    packetDropQueue.setName("Paquetes descartados");
+    packetDropQueue = 0;
+
     feedbackQueue.setName("Buffer de retroalimentación");
-    packetDropQueue.record(0);
     serviceEndEvent = new cMessage("Fin Servicio");
     feedbackEndEvent = new cMessage("Fin Retroalimentación");
     feedbackSent = false;
@@ -56,7 +56,7 @@ void TransportRx::initialize()
 
 void TransportRx::finish()
 {
-    recordScalar("Paquetes_decartados", packetDropQueue.getCount());
+    recordScalar("Paquetes_decartados", packetDropQueue);
 }
 
 void TransportRx::handleMessage(cMessage *msg)
@@ -87,7 +87,7 @@ void TransportRx::handleMessage(cMessage *msg)
         {
             delete(msg);
             this->bubble("Paquete_descartado");
-            packetDropQueue.record(1);
+            packetDropQueue++;
         }
         else
         {
