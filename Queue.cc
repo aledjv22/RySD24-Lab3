@@ -12,7 +12,7 @@ private:
     cQueue buffer;
     cMessage *endServiceEvent;
     simtime_t serviceTime;
-
+    bool feedbackSent;
     cOutVector bufferSizeVector;
     cOutVector packetDropVector;
     // Objects of type cOutVector are responsible
@@ -48,6 +48,7 @@ void Queue::initialize()
     endServiceEvent = new cMessage("endService");
     bufferSizeVector.setName("Size-Vector");
     packetDropVector.setName("Drop-Vector");
+    feedbackSent = false;
 }
 
 void Queue::finish()
@@ -80,13 +81,28 @@ void Queue::handleMessage(cMessage *msg)
         }
         else
         {
-            // enqueue the packet
+            float umbral = 0.80 * par("bufferSize").intValue();
+            float umbralMin = 0.25 * par("bufferSize").intValue();
+
+            if (buffer.getLength() >= umbral && !feedbackSent){
+                cPacket *feedbackPkt = new cPacket("packet");
+                feedbackPkt->setByteLength(20);
+                feedbackPkt->setKind(2);
+                buffer.insertBefore(buffer.front(), feedbackPkt);
+                feedbackSent = true;
+            }else if (buffer.getLength() < umbralMin && feedbackSent){
+                cPacket *feedbackPkt = new cPacket("packet");
+                feedbackPkt->setByteLength(20);
+                feedbackPkt->setKind(3);
+                buffer.insertBefore(buffer.front(), feedbackPkt);
+                feedbackSent = false;
+            }
+            // Enqueue the packet
             buffer.insert(msg);
             bufferSizeVector.record(buffer.getLength());
             // if the server is idle
-            if(!endServiceEvent->isScheduled())
-            {
-                // start the service now
+            if (!endServiceEvent->isScheduled()) {
+                // start the service
                 scheduleAt(simTime() + 0, endServiceEvent);
             }
         }

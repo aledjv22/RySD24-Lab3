@@ -1,0 +1,90 @@
+[plot]
+main title = Buffer Size GenInt 0.25
+x title = Time (sec)
+y title = Packets (units)
+auto scale = 0
+x min user range = 0
+x max user range = 100
+y min user range = 0
+y max user range = 100
+x number of ticks = 10
+y number of ticks = 10
+legend position = 4
+display grid = 1
+background color = 0
+
+[annotation]
+text = Annotation_text
+text x pos. = 0.0
+text y pos. = 0.0
+text color = black
+text size = 10
+text state = 0
+arrow head x pos. = 0.0
+arrow head y pos. = 0.0
+arrow head length = 10
+arrow head width = 4
+arrow color = black
+arrow line width = 0.5
+arrow state = 0
+
+[session]
+working directory = /home/usuario/LAB/redes24lab3g11/Parte2Analisis-Caso1
+curve count = 4
+
+[1]
+name = Buffer Size Sink
+csv file path = /home/usuario/LAB/redes24lab3g11/Parte2Analisis-Caso1/GenInt0.5/2.csv
+x data = BufferSizeQueue Network.nodeRx.traRx (#0 - General-0-20240516-22:36:07-4797)
+y data = Unnamed: 1
+visibility = 1
+line color = red
+line width = 1.0
+line style = solid
+offset in x = 0.0
+offset in y = 0.0
+scale in x = 1.0
+scale in y = 1.0
+
+[2]
+name = Curve_name
+csv file path = /home/usuario/LAB/redes24lab3g11/Parte2Analisis-Caso1/GenInt0.5/3.csv
+x data = PacketDropQueue Network.nodeRx.traRx (#0 - General-0-20240516-22:36:07-4797)
+y data = Unnamed: 1
+visibility = 0
+line color = black
+line width = 1.0
+line style = solid
+offset in x = 0.0
+offset in y = 0.0
+scale in x = 1.0
+scale in y = 1.0
+
+[3]
+name = Buffer Size Source
+csv file path = /home/usuario/LAB/redes24lab3g11/Parte2Analisis-Caso1/GenInt0.5/4.csv
+x data = bufferSize Network.nodeTx.traTx (#0 - General-0-20240516-22:36:07-4797)
+y data = Unnamed: 1
+visibility = 1
+line color = orange
+line width = 1.0
+line style = solid
+offset in x = 0.0
+offset in y = 0.0
+scale in x = 1.0
+scale in y = 1.0
+
+[4]
+name = Buffer Size Queue
+csv file path = /home/usuario/LAB/redes24lab3g11/Parte2Analisis-Caso1/GenInt0.5/5.csv
+x data = Size-Vector Network.queue0 (#0 - General-0-20240516-22:36:07-4797)
+y data = Unnamed: 1
+visibility = 1
+line color = turquoise
+line width = 1.0
+line style = solid
+offset in x = 0.0
+offset in y = 0.0
+scale in x = 1.0
+scale in y = 1.0
+

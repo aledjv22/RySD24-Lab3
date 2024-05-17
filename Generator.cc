@@ -11,6 +11,7 @@ class Generator : public cSimpleModule
 private:
     cMessage *sendMsgEvent;
     cStdDev transmissionStats;
+    unsigned int sentPackets;
 public:
     Generator();
     virtual ~Generator();
@@ -39,10 +40,12 @@ void Generator::initialize()
     sendMsgEvent = new cMessage("sendEvent");
     // schedule the first event at random time
     scheduleAt(par("generationInterval"), sendMsgEvent);
+    sentPackets = 0;
 }
 
 void Generator::finish()
 {
+    recordScalar("Packages sent", sentPackets);
 }
 
 void Generator::handleMessage(cMessage *msg)
@@ -57,7 +60,7 @@ void Generator::handleMessage(cMessage *msg)
     pkt->setByteLength(par("packetByteSize"));
     // send to the output
     send(pkt, "out");
-
+    sentPackets++;
     // compute the new departure time
     simtime_t departureTime = simTime() + par("generationInterval");
     // schedule the new packet generation
