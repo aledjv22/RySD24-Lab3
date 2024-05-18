@@ -84,13 +84,16 @@ void Queue::handleMessage(cMessage *msg)
             float umbral = 0.80 * par("bufferSize").intValue();
             float umbralMin = 0.25 * par("bufferSize").intValue();
 
-            if (buffer.getLength() >= umbral && !feedbackSent){
+            if (buffer.getLength() >= umbral && !feedbackSent)
+            {
                 cPacket *feedbackPkt = new cPacket("packet");
                 feedbackPkt->setByteLength(20);
                 feedbackPkt->setKind(2);
                 buffer.insertBefore(buffer.front(), feedbackPkt);
                 feedbackSent = true;
-            }else if (buffer.getLength() < umbralMin && feedbackSent){
+            }
+            else if (buffer.getLength() < umbralMin && feedbackSent)
+            {
                 cPacket *feedbackPkt = new cPacket("packet");
                 feedbackPkt->setByteLength(20);
                 feedbackPkt->setKind(3);
@@ -101,7 +104,8 @@ void Queue::handleMessage(cMessage *msg)
             buffer.insert(msg);
             bufferSizeVector.record(buffer.getLength());
             // if the server is idle
-            if (!endServiceEvent->isScheduled()) {
+            if (!endServiceEvent->isScheduled())
+            {
                 // start the service
                 scheduleAt(simTime() + 0, endServiceEvent);
             }
